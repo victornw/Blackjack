@@ -140,7 +140,7 @@ main {
   top: 46.1rem;
 }
 
-.btn-stop1 {
+/* .btn-stop1 {
   top: 32.5rem;
   margin-left: -255px;
 }
@@ -148,7 +148,7 @@ main {
 .btn-stop2 {
   top: 32.5rem;
   margin-left: 255px;
-}
+} */
 
 .btn:active {
   transform: translate(-50%, 3px);

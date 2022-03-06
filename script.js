@@ -8,13 +8,13 @@ function randomCard() {
   let randomN = Math.trunc(Math.random() * 52);
   return cards[randomN];
 }
-
-let current1 = document.querySelector("#current--0").textContent;
-let current2 = document.querySelector("#current--1").textContent;
+//VARS
+let current1 = document.querySelector("#current--0");
+let current2 = document.querySelector("#current--1");
 let rollBtn = document.querySelector(".btn-roll");
 let holdBtn = document.querySelector(".btn-hold");
-let score1 = document.querySelector("#score--0").textContent;
-let score2 = document.querySelector("#score--1").textContent;
+let score1 = document.querySelector("#score--0");
+let score2 = document.querySelector("#score--1");
 let stop1 = document.querySelector(".btn-stop1");
 let stop2 = document.querySelector(".btn-stop2");
 let allBuy1 = 0;
@@ -23,82 +23,91 @@ let player1 = document.querySelector(".player--0");
 let player2 = document.querySelector(".player--1");
 let stopGame = 0;
 let newGame = document.querySelector(".btn-new");
-
+let lock1 = 0;
+let lock2 = 0;
+let lock = 1;
+// ---------------------------------------------------------------
 rollBtn.addEventListener("click", function () {
   if (player1.classList.contains("player--active")) {
     let random = randomCard();
-    document.querySelector("#current--0").textContent = random;
+    current1.textContent = random;
     allBuy1 += random;
-    document.querySelector("#score--0").textContent = allBuy1;
+    score1.textContent = allBuy1;
     if (allBuy1 > 21) {
-      alert("Player 1 queimou");
+      alert("PLAYER 1 EXCEEDED THE 21 LIMIT! \n PLAYER 2 WINS 🎉");
+      return resetGame();
+      // changeToPlayer1();
     }
   } else {
     let random = randomCard();
-    document.querySelector("#current--1").textContent = random;
+    current2.textContent = random;
     allBuy2 += random;
-    document.querySelector("#score--1").textContent = allBuy2;
+    score2.textContent = allBuy2;
     if (allBuy2 > 21) {
-      alert("Player 2 queimou");
+      alert("PLAYER 2 EXCEEDED THE 21 LIMIT! \n PLAYER 1 WINS 🎉");
+      return resetGame();
+      // changeToPlayer1();
     }
   }
-  if (player1.classList.contains("player--active")) {
-    player1.classList.remove("player--active");
-    player2.classList.add("player--active");
-  } else if (player2.classList.contains("player--active")) {
-    player1.classList.add("player--active");
-    player2.classList.remove("player--active");
-  }
+  changePlayer();
 });
 
 holdBtn.addEventListener("click", function () {
-  if (player1.classList.contains("player--active")) {
-    player1.classList.remove("player--active");
-    player2.classList.add("player--active");
-  } else if (player2.classList.contains("player--active")) {
-    player1.classList.add("player--active");
-    player2.classList.remove("player--active");
+  console.log(lock, lock1, lock2);
+  if (lock < 2) {
+    if (player1.classList.contains("player--active")) {
+      lock1++;
+    } else if (player2.classList.contains("player--active")) {
+      lock2++;
+    }
+  } else return gameStop();
+  console.log("fodase");
+  if (lock1 > 0) {
+    lock += lock2;
+  } else if (lock2 > 0) {
+    lock += lock1;
   }
+  changePlayer();
 });
 
-stop1.addEventListener("click", function () {
-  if (player1.classList.contains("player--active")) {
-    stopGame++;
-    stop1.disabled = true;
-    gameStop();
-    if (player1.classList.contains("player--active")) {
-      player1.classList.remove("player--active");
-      player2.classList.add("player--active");
-    } else if (player2.classList.contains("player--active")) {
-      player1.classList.add("player--active");
-      player2.classList.remove("player--active");
-    }
-  }
-});
-stop2.addEventListener("click", function () {
-  if (player2.classList.contains("player--active")) {
-    stopGame++;
-    gameStop();
-    stop2.disabled = true;
-    if (player1.classList.contains("player--active")) {
-      player1.classList.remove("player--active");
-      player2.classList.add("player--active");
-    } else if (player2.classList.contains("player--active")) {
-      player1.classList.add("player--active");
-      player2.classList.remove("player--active");
-    }
-  }
-});
+// stop1.addEventListener("click", function () {
+//   if (player1.classList.contains("player--active")) {
+//     stopGame++;
+//     stop1.disabled = true;
+//     gameStop();
+//     changePlayer();
+//   }
+// });
+// stop2.addEventListener("click", function () {
+//   if (player2.classList.contains("player--active")) {
+//     stopGame++;
+//     gameStop();
+//     stop2.disabled = true;
+//     changePlayer();
+//   }
+// });
 
 function gameStop() {
-  if (stopGame === 2) {
-    if (allBuy1 > allBuy2) alert("Player 1 win");
-    else if (allBuy2 > allBuy1) alert("Player 2 win");
-    else if (allBuy1 === 21 && allBuy1 === allBuy2) alert("tie");
+  if (lock > 2 || lock == 2) {
+    if (allBuy1 > allBuy2) {
+      alert("Player 1 win");
+      resetGame();
+    } else if (allBuy2 > allBuy1) {
+      alert("Player 2 win");
+      resetGame();
+    } else if (allBuy1 === 21 && allBuy1 === allBuy2) {
+      alert("Tie! both win");
+      resetGame();
+    } else if (allBuy1 == allBuy2) {
+      alert("Tie! both lose");
+      resetGame();
+    }
   }
 }
-console.log(current2);
-newGame.addEventListener("click", function () {
+
+newGame.addEventListener("click", resetGame);
+
+function resetGame() {
   stopGame = 0;
   document.querySelector("#current--0").textContent = "0";
   document.querySelector("#current--1").textContent = "0";
@@ -106,8 +115,23 @@ newGame.addEventListener("click", function () {
   document.querySelector("#score--1").textContent = "0";
   allBuy1 = 0;
   allBuy2 = 0;
-  if (player2.classList.contains("player--active")) {
+  lock = 1;
+  lock1 = 0;
+  lock2 = 0;
+  playerStart();
+}
+
+function changePlayer() {
+  if (player1.classList.contains("player--active")) {
+    player1.classList.remove("player--active");
+    player2.classList.add("player--active");
+  } else if (player2.classList.contains("player--active")) {
     player1.classList.add("player--active");
     player2.classList.remove("player--active");
   }
-});
+}
+
+function playerStart() {
+  player1.classList.add("player--active");
+  player2.classList.remove("player--active");
+}
